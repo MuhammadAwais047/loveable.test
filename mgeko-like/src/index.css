@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  @apply bg-background text-foreground antialiased font-sans;
+}
+
+.container-xl {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.glow {
+  box-shadow: 0 0 80px rgba(154, 230, 180, 0.15);
+}
+
+.section {
+  @apply py-16 sm:py-24;
+}
