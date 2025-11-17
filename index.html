@@ -8,547 +8,252 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <meta name="theme-color" content="#4c1d95">
   <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <!-- TESSERACT + PDF.JS (Critical for PDF OCR) -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.worker.min.js';
+  </script>
+
   <style>
-    :root { --primary: #8b5cf6; --secondary: #ec4899; }
-    .drop-zone { border: 3px dashed var(--primary); transition: all 0.3s ease; }
-    .drop-zone.dragover { background: rgba(139,92,246,0.1); border-color: #a78bfa; transform: scale(1.02); }
-    .progress-bar { height: 8px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 4px; transition: width 0.4s ease; }
-    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
-    .hover-lift { transition: all 0.3s; }
-    .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-    .correct { background: #10b981 !important; color: white; }
-    .wrong { background: #ef4444 !important; color: white; }
-    .section { display: none; }
-    .section.active { display: block; }
-    .exhibit-img {
-      max-width: 100%;
-      border-radius: 12px;
-      margin: 12px 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      height: auto;
-    }
-    .dark-mode {
-      background: linear-gradient(to bottom right, #0f172a, #1e293b, #1e1b4b) !important;
-    }
-    /* Mobile-specific adjustments */
-    @media (max-width: 768px) {
-      .text-6xl { font-size: 2.5rem; }
-      .text-5xl { font-size: 2.25rem; }
-      .text-4xl { font-size: 2rem; }
-      .text-3xl { font-size: 1.875rem; }
-      .text-2xl { font-size: 1.5rem; }
-      .px-8 { padding-left: 1rem; padding-right: 1rem; }
-      .py-8 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-      .px-6 { padding-left: 1rem; padding-right: 1rem; }
-      .py-6 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
-      .px-5 { padding-left: 1rem; padding-right: 1rem; }
-      .py-5 { padding-top: 1rem; padding-bottom: 1rem; }
-      .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
-      .py-4 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-      .gap-6 { gap: 1rem; }
-      .gap-3 { gap: 0.5rem; }
-      .p-16 { padding: 1.5rem; }
-      .rounded-3xl { border-radius: 1rem; }
-      .text-xl { font-size: 1.125rem; }
-      .h-80 { height: 40vh; }
-      .max-w-3xl { max-width: 100%; }
-      nav { flex-wrap: wrap; justify-content: center; }
-      .fixed { position: fixed; }
+    :root { --p: #8b5cf6; --s: #ec4899; }
+    .drop-zone { border: 3px dashed var(--p); transition: all 0.3s; border-radius: 1.5rem; }
+    .drop-zone.dragover { background: rgba(139,92,246,0.15); transform: scale(1.02); }
+    .bar { height: 10px; background: linear-gradient(90deg,var(--p),var(--s)); border-radius: 8px; }
+    .glass { background: rgba(255,255,255,.08); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.15); }
+    .section{display:none}.section.active{display:block}
+    .correct{background:#10b981!important;color:white}.wrong{background:#ef4444!important;color:white}
+    .exhibit-img{max-width:100%;border-radius:12px;margin:12px 0;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+    @media(max-width:768px){
+      .text-6xl{font-size:2.5rem}.text-5xl{font-size:2rem}.text-4xl{font-size:1.8rem}
+      .p-16{padding:2rem}.h-80{height:50vh}
     }
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
 
-  <button onclick="toggleDarkMode()" class="fixed top-3 right-3 z-50 text-lg bg-white/10 border border-white/20 rounded-full p-2 hover:bg-white/20 transition">
-    <span id="darkModeIcon">🌙</span>
-  </button>
+<button onclick="document.body.classList.toggle('dark-mode');this.innerHTML=document.body.classList.contains('dark-mode')?'Sun':'Moon'" 
+  class="fixed top-4 right-4 z-50 text-2xl bg-white/10 border border-white/20 rounded-full p-3">Moon</button>
 
-  <header class="max-w-6xl mx-auto px-4 py-4">
-    <div class="flex flex-col items-center">
-      <div class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">QuizForge</div>
-      <nav class="flex flex-wrap justify-center gap-2 mt-2">
-        <button class="px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('home')">Home</button>
-        <button class="px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('upload')">Upload</button>
-        <button class="px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('play')">Play</button>
-      </nav>
+<header class="max-w-6xl mx-auto px-4 py-6 text-center">
+  <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">QuizForge</h1>
+  <nav class="flex justify-center gap-4 mt-4 flex-wrap">
+    <button onclick="s('home')" class="px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20">Home</button>
+    <button onclick="s('upload')" class="px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20">Upload</button>
+    <button onclick="s('play');startQuiz('ccna-200-301')" class="px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20">Play</button>
+  </nav>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 space-y-10">
+
+  <!-- HOME -->
+  <section id="home" class="section active text-center">
+    <h2 class="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Turn Notes into Victory</h2>
+    <p class="text-xl mb-6">Pakistan's #1 AI Quiz App • CCNA + Scanned Books</p>
+    <button onclick="s('upload')" class="px-10 py-5 text-xl rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-110 transition font-bold">Upload Notes</button>
+    <div class="glass rounded-3xl p-8 mt-10"><h3 class="text-3xl font-bold mb-6">My Decks</h3><div id="decks" class="grid md:grid-cols-3 gap-6"></div></div>
+  </section>
+
+  <!-- UPLOAD -->
+  <section id="upload" class="section text-center space-y-8">
+    <h2 class="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Upload Your Notes</h2>
+    <p class="text-xl">PDF • Photos • TXT • Urdu + English • 100% Private</p>
+    <div id="drop" class="drop-zone glass p-16 cursor-pointer rounded-3xl">
+      <i class="fas fa-brain text-9xl text-purple-400 mb-6"></i>
+      <p class="text-3xl font-bold">Drop PDF / Photo Here</p>
+      <input type="file" id="file" accept=".pdf,.jpg,.jpeg,.png,.txt" class="hidden">
     </div>
-  </header>
+    <div id="result" class="hidden glass rounded-3xl p-8 space-y-6">
+      <div class="flex justify-between items-center"><h3 class="text-2xl font-bold">AI Reading...</h3><i id="icon" class="fas fa-cog fa-spin text-4xl text-purple-400"></i></div>
+      <div class="w-full bg-white/10 rounded-full h-10 overflow-hidden"><div id="bar" class="bar w-0"></div></div>
+      <p id="msg" class="text-xl">Initializing AI Vision...</p>
+      <textarea id="txt" class="w-full h-96 bg-white/5 border border-white/20 rounded-2xl p-6 text-lg" placeholder="Extracted text will appear here..."></textarea>
+      <button id="gen" class="px-12 py-5 text-2xl rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 hover:scale-110 transition font-bold">Generate Quiz</button>
+    </div>
+  </section>
 
-  <main class="max-w-6xl mx-auto px-3 py-4">
-    <!-- HOME SECTION -->
-    <section id="home" class="section active space-y-6">
-      <div class="text-center py-8">
-        <h1 class="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Turn Your Notes into Victory
-        </h1>
-        <p class="text-base md:text-lg text-white/80 mb-4">Pakistan's #1 AI Quiz App • Includes Cisco CCNA Questions</p>
-        <div class="flex flex-col sm:flex-row justify-center gap-3">
-          <button class="px-4 py-3 text-base rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition" onclick="showSection('upload')">
-            <i class="fas fa-upload mr-1"></i> Upload Notes
-          </button>
-          <button class="px-4 py-3 text-base rounded-xl bg-white/10 border border-white/30 hover:bg-white/20 transition" onclick="showSection('play')">
-            <i class="fas fa-play mr-1"></i> Start CCNA Quiz
-          </button>
-        </div>
+  <!-- PLAY -->
+  <section id="play" class="section">
+    <div class="glass rounded-3xl p-10 max-w-4xl mx-auto text-center">
+      <img id="exhibit" class="exhibit-img hidden" src="" alt="Exhibit">
+      <h2 id="qtext" class="text-3xl font-bold mb-8"></h2>
+      <div id="opts" class="space-y-5"></div>
+      <div class="flex justify-between mt-10">
+                <button id="next" class="px-12 py-6 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-bold text-xl">Next</button>
       </div>
-
-      <div class="glass hover-lift rounded-2xl p-5 text-center">
-        <h2 class="text-2xl font-bold mb-4">My Decks</h2>
-        <div id="home_decks" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        <p class="text-white/60 mt-4 text-sm" id="no_decks">No custom decks yet • Upload notes to create one!</p>
+      <div id="end" class="hidden mt-20">
+        <h2 class="text-7xl font-bold mb-6 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+          Score: <span id="sc">0</span>/<span id="tot">0</span>
+        </h2>
+        <button onclick="s('home')" class="px-16 py-8 text-3xl rounded-3xl bg-gradient-to-r from-purple-600 to-pink-600 font-bold hover:scale-110 transition">Back to Home</button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- UPLOAD SECTION -->
-    <section id="upload" class="section space-y-6">
-      <div class="text-center py-8">
-        <h1 class="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Upload Your Notes
-        </h1>
-        <p class="text-base text-white/80 mb-6">PDF, Photo, TXT • Urdu + English • 100% Private</p>
-        
-        <div id="drop_zone" class="drop-zone rounded-2xl p-8 mb-6 cursor-pointer hover-lift glass">
-          <i class="fas fa-cloud-upload-alt text-4xl md:text-5xl mb-3 text-purple-400"></i>
-          <p class="text-xl font-bold mb-1">Drop files here</p>
-          <p class="text-sm text-white/60">or tap to browse</p>
-          <input type="file" id="file_input" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.txt" multiple>
-        </div>
+</main>
 
-        <div id="upload_result" class="mt-6 hidden">
-          <div class="glass rounded-2xl p-5">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-lg font-bold">AI Processing...</h3>
-              <i id="status_icon" class="fas fa-cog fa-spin text-purple-400 text-xl"></i>
-            </div>
-            <div class="w-full bg-white/10 rounded-full h-3 mb-3">
-              <div id="progress_bar" class="progress-bar h-3 rounded-full" style="width: 0%"></div>
-            </div>
-            <p id="progress_text" class="text-center text-sm">Initializing AI Vision...</p>
-          </div>
-          
-          <div class="glass rounded-2xl p-5 mt-4">
-            <h3 class="text-lg font-bold mb-3">Extracted Text</h3>
-            <textarea id="text_input" class="w-full h-40 bg-white/5 border border-white/20 rounded-lg p-3 text-sm" placeholder="Your text will appear here..."></textarea>
-            <div class="mt-4 text-center">
-              <button id="process_btn" class="px-5 py-2.5 text-base rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition font-medium">
-                Generate Quiz
-              </button>
-            </div>
-          </div>
-        </div>
+<script>
+// Navigation
+const s = x => document.querySelectorAll('.section').forEach(el => el.classList.toggle('active', el.id === x));
+
+// CCNA Questions (Real 200-301 Style)
+const ccnaDeck = [
+  {q:"What does OSPF stand for?",o:["Open Shortest Path First","Onion Soup Protocol First","Open System Path Forward"],c:0},
+  {q:"Default administrative distance of OSPF?",o:["90","100","110","120"],c:2},
+  {q:"Which layer does a switch primarily operate?",o:["Layer 1","Layer 2","Layer 3","Layer 4"],c:1},
+  {q:"What is the purpose of ARP?",o:["Resolve IP to MAC","Encrypt traffic","Route packets","Assign IP"],c:0},
+  {q:"Which command shows the routing table?",o:["show ip route","show running-config","show interfaces","show version"],c:0}
+];
+
+let worker, currentDeck = [], qIndex = 0, score = 0;
+
+// Initialize Tesseract OCR (Urdu + English)
+(async () => {
+  worker = await Tesseract.createWorker('eng+urd', 1, {
+    logger: m => {
+      if (m.status === 'recognizing text') {
+        document.getElementById('bar').style.width = (m.progress * 100) + '%';
+        document.getElementById('msg').textContent = `AI Reading: ${Math.round(m.progress*100)}%`;
+      }
+    }
+  });
+  document.getElementById('msg').textContent = 'AI Vision Ready! Drop your file!';
+})();
+
+// File Drop & Click
+const dropZone = document.getElementById('drop');
+dropZone.onclick = () => document.getElementById('file').click();
+document.getElementById('file').onchange = e => e.target.files[0] && processFile(e.target.files[0]);
+
+['dragover','dragenter'].forEach(ev => dropZone.addEventListener(ev, e => {e.preventDefault(); dropZone.classList.add('dragover')}));
+['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, () => dropZone.classList.remove('dragover')));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
+});
+
+// Process File (PDF + Images + TXT)
+async function processFile(file) {
+  document.getElementById('result').classList.remove('hidden');
+  let fullText = '';
+
+  if (file.name.endsWith('.txt')) {
+    fullText = await file.text();
+  } 
+  else if (file.type.startsWith('image/') || file.name.match(/\.(pdf|jpe?g|png)$/i)) {
+    document.getElementById('msg').textContent = 'Processing document...';
+
+    if (file.name.endsWith('.pdf')) {
+      const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({scale: 2.0});
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width; canvas.height = viewport.height;
+        await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+        const result = await worker.recognize(canvas.toDataURL());
+        fullText += result.data.text + '\n\n';
+        document.getElementById('bar').style.width = ((i/pdf.numPages)*100) + '%';
+      }
+    } else {
+      const result = await worker.recognize(file);
+      fullText = result.data.text;
+    }
+  }
+
+  document.getElementById('txt').value = fullText || 'No text found. Try clearer image.';
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('msg').textContent = 'Done! Click Generate Quiz';
+  document.getElementById('icon').className = 'fas fa-check-circle text-green-400 text-5xl';
+}
+
+// Generate Quiz from Text
+document.getElementById('gen').onclick = () => {
+  const text = document.getElementById('txt').value.trim();
+  if (!text) return alert('No text to generate quiz!');
+
+  const paragraphs = text.split('\n\n').filter(p => p.length > 50);
+  currentDeck = paragraphs.slice(0, 25).map((para, i) => ({
+    q: para.split('\n')[0].slice(0, 180) + (para.length > 180 ? '...' : '') + '?',
+    o: ['Correct Answer', 'Wrong Option A', 'Wrong Option B', 'Wrong Option C'],
+    c: 0
+  }));
+
+  // Save deck
+  const deckName = `Deck ${new Date().toLocaleDateString('en-GB')}`;
+  localStorage.setItem('deck_' + Date.now(), JSON.stringify({name: deckName, questions: currentDeck}));
+  loadDecks();
+  startQuiz(currentDeck, deckName);
+};
+
+// Start CCNA Quiz
+function startQuiz(deckId) {
+  if (deckId === 'ccna-200-301') {
+    currentDeck = ccnaDeck;
+    playQuiz('Cisco CCNA 200-301 Practice');
+  } else {
+    const saved = Object.keys(localStorage).find(k => k.includes(deckId));
+    if (saved) {
+      currentDeck = JSON.parse(localStorage[saved]).questions;
+      playQuiz(JSON.parse(localStorage[saved]).name);
+    }
+  }
+}
+
+function playQuiz(title = 'Quiz') {
+  document.getElementById('qtext').textContent = title;
+  qIndex = 0; score = 0;
+  showQuestion();
+  s('play');
+}
+
+function showQuestion() {
+  if (qIndex >= currentDeck.length) {
+    document.getElementById('end').classList.remove('hidden');
+    document.getElementById('sc').textContent = score;
+    document.getElementById('tot').textContent = currentDeck.length;
+    return;
+  }
+
+  const qq = currentDeck[qIndex];
+  document.getElementById('qtext').textContent = `Question ${qIndex + 1}: ${qq.q}`;
+  document.getElementById('opts').innerHTML = qq.o.map((opt, i) => `
+    <button onclick="answer(${i},${qq.c})" class="w-full p-8 text-left rounded-3xl glass hover:bg-white/10 transition text-xl font-medium">
+      ${String.fromCharCode(65 + i)}) ${opt}
+    </button>
+  `).join('');
+
+  document.getElementById('prev').disabled = qIndex === 0;
+  document.getElementById('end').classList.add('hidden');
+}
+
+window.answer = (selected, correct) => {
+  if (selected === correct) score++;
+  qIndex++;
+  setTimeout(showQuestion, 700);
+};
+
+document.getElementById('next').onclick = () => { qIndex++; showQuestion(); };
+document.getElementById('prev').onclick = () => { qIndex--; showQuestion(); };
+
+// Load Saved Decks on Home
+function loadDecks() {
+  const container = document.getElementById('decks');
+  const saved = Object.keys(localStorage).filter(k => k.startsWith('deck_')).sort().reverse();
+  
+  container.innerHTML = saved.length ? saved.map(key => {
+    const d = JSON.parse(localStorage[key]);
+    return `
+      <div onclick="startQuiz('${key}')" class="glass rounded-3xl p-8 cursor-pointer hover:scale-105 transition text-center">
+        <h3 class="text-2xl font-bold text-purple-300">${d.name}</h3>
+        <p class="text-xl mt-4">${d.questions.length} Questions</p>
       </div>
-    </section>
-
-    <!-- PLAY SECTION -->
-    <section id="play" class="section space-y-6">
-      <div class="text-center py-4">
-        <h1 class="text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Quiz Time!
-        </h1>
-        <p class="text-sm md:text-base text-white/80 mb-2" id="play-mode-text">Test your knowledge</p>
-      </div>
-      
-      <div id="quiz_container" class="glass rounded-2xl p-4 md:p-6">
-        <div id="question_card">
-          <img id="exhibit_img" class="exhibit-img hidden" src="" alt="Exhibit">
-          <h2 id="question_text" class="text-base md:text-lg font-bold mb-4 min-h-[60px]">Loading question...</h2>
-          <div id="options_container" class="space-y-2 mb-5"></div>
-          <div class="flex flex-col sm:flex-row justify-between gap-2">
-            <button id="prev_btn" class="px-3 py-2 rounded-lg bg-white/10 border border-white/30 hover:bg-white/20 transition text-sm" disabled>
-              <i class="fas fa-arrow-left mr-1"></i> Prev
-            </button>
-            <button id="next_btn" class="px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-sm font-medium">
-              Next <i class="fas fa-arrow-right ml-1"></i>
-            </button>
-          </div>
-        </div>
-        
-        <div id="results_container" class="hidden text-center py-5">
-          <h2 class="text-xl font-bold mb-2">Quiz Complete!</h2>
-          <div class="text-4xl font-bold my-3 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent" id="score_display">0/0</div>
-          <div class="flex flex-col sm:flex-row justify-center gap-2 mt-4">
-            <button id="retry_btn" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-sm">
-              <i class="fas fa-redo mr-1"></i> Retry
-            </button>
-            <button class="px-4 py-2 rounded-lg bg-white/10 border border-white/30 hover:bg-white/20 transition text-sm" onclick="showSection('home')">
-              <i class="fas fa-home mr-1"></i> Home
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    // ========== PRE-LOADED CCNA QUESTIONS ==========
-    const ccnaQuestions = [
-      { id: 1, text: "What is the purpose of the DNS (Domain Name System) in a network?", options: ["To assign IP addresses dynamically", "To map domain names to IP addresses", "To encrypt data for secure transmission", "To facilitate routing between different networks"], correct: 1, hasImage: false },
-      { id: 3, text: "what occurs to frames during the process of frame flooding?", options: ["Frames are sent to every port on the switch in the same VLAN except from the originating port", "Frames are sent to every port on the switch that has a matching entry in the MAC address table.", "Frames are sent to all ports, including those that are assigned to other VLANs.", "Frames are sent to every port on the switch in the same VLAN."], correct: 0, hasImage: false },
-      { id: 5, text: "Refer to the exhibit. Which switch in this configuration will be elected as the root bridge?", options: ["SW1", "SW2", "SW3", "SW4"], correct: 2, hasImage: true },
-      { id: 6, text: "What is the purpose of the ICMP protocol in networking?", options: ["Manage IP addresses dynamically", "Encrypt data for secure transmission", "Troubleshoot and diagnose network connectivity issues", "Provide secure remote access"], correct: 2, hasImage: false },
-      { id: 8, text: "Which device operates at Layer 2 of the OSI model?", options: ["Hub", "Router", "Switch", "Firewall"], correct: 2, hasImage: false },
-      { id: 13, text: "Refer to the exhibit. When PC-A sends traffic to PC-B, which network component is in charge of receiving the packet from PC-A, verifying the IP addresses, and forwarding the packet to PC-B?", options: ["Layer 2 switch", "Router", "Load balancer", "firewall"], correct: 1, hasImage: true },
-      { id: 16, text: "What is the purpose of NAT (Network Address Translation) in networking?", options: ["To map private IP addresses to public IP addresses", "To encrypt data in transit", "To manage IP addresses dynamically", "To establish secure connections between devices"], correct: 0, hasImage: false },
-      { id: 17, text: "Refer to the exhibit. Routers R1 and R2 have been configured with their respective LAN interfaces. The two circuits are operational and reachable across WAN. Which command set establishes failover redundancy if the primary circuit goes down?", options: ["Option A", "Option B", "Option C", "Option D"], correct: 1, hasImage: true },
-      { id: 32, text: "What is the purpose of the Spanning Tree Protocol (STP) in a network?", options: ["To map IP addresses to MAC addresses", "To dynamically assign IP addresses to devices", "To prevent loops in Ethernet networks", "To establish a secure connection between devices"], correct: 2, hasImage: false },
-      { id: 34, text: "Refer to the exhibit. What does router R1 use as its OSPF router-ID?", options: ["10.10.1.10", "10.10.10.20", "172.16.15.10", "192.168.0.1"], correct: 2, hasImage: true }
-    ];
-
-    // In-memory storage (replaces localStorage)
-    let decks = [
-      {
-        id: "ccna-200-301",
-        name: "Cisco CCNA 200-301",
-        created: "2023-11-18T10:00:00Z",
-        data: ccnaQuestions
-      }
-    ];
-    
-    let worker = null;
-    let isDarkMode = false;
-    
-    // DOM Elements
-    const sections = document.querySelectorAll('.section');
-    const dropZone = document.getElementById('drop_zone');
-    const fileInput = document.getElementById('file_input');
-    const uploadResult = document.getElementById('upload_result');
-    const progressBar = document.getElementById('progress_bar');
-    const progressText = document.getElementById('progress_text');
-    const statusIcon = document.getElementById('status_icon');
-    const textInput = document.getElementById('text_input');
-    const processBtn = document.getElementById('process_btn');
-    const questionText = document.getElementById('question_text');
-    const optionsContainer = document.getElementById('options_container');
-    const exhibitImg = document.getElementById('exhibit_img');
-    const prevBtn = document.getElementById('prev_btn');
-    const nextBtn = document.getElementById('next_btn');
-    const resultsContainer = document.getElementById('results_container');
-    const questionCard = document.getElementById('question_card');
-    const scoreDisplay = document.getElementById('score_display');
-    const retryBtn = document.getElementById('retry_btn');
-    const homeDecks = document.getElementById('home_decks');
-    const noDecks = document.getElementById('no_decks');
-    const playModeText = document.getElementById('play-mode-text');
-    const darkModeIcon = document.getElementById('darkModeIcon');
-
-    // Quiz State
-    let currentQuestionIndex = 0;
-    let quizQuestions = [];
-    let userAnswers = [];
-    let score = 0;
-    let currentDeckId = null;
-
-    // Initialize Tesseract.js
-    (async () => {
-      console.log('Loading QuizForge AI Vision (Urdu + English)...');
-      try {
-        worker = await Tesseract.createWorker('eng+urd', 1, {
-          workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/worker.min.js',
-          langPath: 'https://tesseract.projectnaptha.com/data/5.0.0',
-          corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.0/tesseract.core.wasm.js',
-          logger: m => {
-            if (m.status === 'recognizing text') {
-              progressText.textContent = `AI Reading: ${Math.round(m.progress * 100)}%`;
-              progressBar.style.width = `${m.progress * 100}%`;
-            }
-          }
-        });
-        progressText.textContent = 'AI Vision Ready! Drop your file!';
-        statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
-      } catch (err) {
-        console.error('Tesseract initialization failed:', err);
-        progressText.textContent = 'AI Vision failed. Please refresh.';
-        statusIcon.className = 'fas fa-times-circle text-red-400 text-xl';
-      }
-    })();
-
-    // Navigation
-    function showSection(sectionId) {
-      sections.forEach(s => s.classList.remove('active'));
-      document.getElementById(sectionId).classList.add('active');
-      
-      if (sectionId === 'upload') {
-        uploadResult.classList.add('hidden');
-        textInput.value = '';
-        resetUploadUI();
-      } else if (sectionId === 'play' && currentDeckId === null) {
-        startQuiz("ccna-200-301");
-      }
-    }
-
-    function resetUploadUI() {
-      progressBar.style.width = '0%';
-      progressText.textContent = 'AI Vision Ready! Drop your file!';
-      statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
-    }
-
-    // Dark Mode Toggle
-    function toggleDarkMode() {
-      isDarkMode = !isDarkMode;
-      document.body.classList.toggle('dark-mode', isDarkMode);
-      darkModeIcon.textContent = isDarkMode ? '☀️' : '🌙';
-    }
-
-    // File Upload Handling
-    dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', handleFileSelect);
-    
-    ['dragover', 'dragenter'].forEach(eventName => {
-      dropZone.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-      });
-    });
-    
-    ['dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, () => {
-        dropZone.classList.remove('dragover');
-      });
-    });
-    
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        handleFileSelect();
-      }
-    });
-
-    async function handleFileSelect() {
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      uploadResult.classList.remove('hidden');
-      textInput.value = '';
-      progressBar.style.width = '5%';
-      progressText.textContent = 'Opening file...';
-      statusIcon.className = 'fas fa-cog fa-spin text-purple-400 text-xl';
-
-      try {
-        if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            textInput.value = e.target.result;
-            progressBar.style.width = '100%';
-            progressText.textContent = 'Text loaded!';
-            statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
-          };
-          reader.readAsText(file);
-        }
-        else if (file.type.includes('image') || file.name.match(/\.(pdf|jpe?g|png)$/i)) {
-          progressText.textContent = 'AI scanning file...';
-          statusIcon.className = 'fas fa-eye text-purple-400 text-xl';
-          
-          if (file.type.includes('image')) {
-            const result = await worker.recognize(file);
-            textInput.value = result.data.text || 'No text found. Try clearer image.';
-            progressBar.style.width = '100%';
-            progressText.textContent = 'Scanned successfully!';
-            statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
-          } else {
-            setTimeout(() => {
-              textInput.value = `Sample text from ${file.name}.\n\n• AI processed your document\n• Supports Urdu & English\n• Ready for quiz generation!`;
-              progressBar.style.width = '100%';
-              progressText.textContent = 'Scanned successfully!';
-              statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
-            }, 2000);
-          }
-        }
-      } catch (err) {
-        console.error('File error:', err);
-        progressText.textContent = 'Error: ' + (err.message || 'Processing failed');
-        statusIcon.className = 'fas fa-times-circle text-red-400 text-xl';
-      }
-    }
-
-    // Quiz Functions
-    processBtn.addEventListener('click', () => {
-      if (!textInput.value.trim()) {
-        alert('Please upload a file or enter text first!');
-        return;
-      }
-      generateQuizFromText(textInput.value);
-      showSection('play');
-    });
-
-    function generateQuizFromText(text) {
-      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
-      quizQuestions = [];
-      
-      for (let i = 0; i < Math.min(5, sentences.length); i++) {
-        const sentence = sentences[i].trim();
-        const words = sentence.split(' ');
-        
-        if (words.length > 4) {
-          const blankIndex = Math.floor(words.length / 2);
-          const correctAnswer = words[blankIndex];
-          words[blankIndex] = '_______';
-          
-          quizQuestions.push({
-            question: words.join(' '),
-            correctAnswer: correctAnswer,
-            options: [
-              correctAnswer,
-              words[Math.max(0, blankIndex-1)],
-              words[Math.min(words.length-1, blankIndex+1)],
-              words[Math.floor(Math.random() * words.length)]
-            ].sort(() => Math.random() - 0.5)
-          });
-        }
-      }
-      
-      if (quizQuestions.length === 0) {
-        quizQuestions = [{
-          question: "AI couldn't generate questions. Try different notes!",
-          correctAnswer: "Try again",
-          options: ["Try again", "Upload new notes", "Use sample questions", "Contact support"]
-        }];
-      }
-      
-      const newDeck = {
-        id: Date.now().toString(),
-        name: `Deck ${decks.length}`,
-        created: new Date().toISOString(),
-        data: quizQuestions
-      };
-      
-      decks.push(newDeck);
-      renderHomeDecks();
-      currentDeckId = newDeck.id;
-      playModeText.textContent = "Your custom quiz";
-      startQuizForCurrentDeck();
-    }
-
-    function startQuiz(deckId) {
-      currentDeckId = deckId;
-      const deck = decks.find(d => d.id === deckId);
-      if (!deck) return;
-      
-      quizQuestions = deck.data;
-      playModeText.textContent = deckId === "ccna-200-301" 
-        ? "CCNA Practice" 
-        : deck.name;
-      
-      startQuizForCurrentDeck();
-    }
-
-    function startQuizForCurrentDeck() {
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizQuestions.length).fill(null);
-      score = 0;
-      showQuestion();
-      showSection('play');
-    }
-
-    function showQuestion() {
-      if (!quizQuestions || quizQuestions.length === 0) {
-        console.error("No questions loaded");
-        return;
-      }
-
-      if (currentQuestionIndex >= quizQuestions.length) {
-        showResults();
-        return;
-      }
-
-      const q = quizQuestions[currentQuestionIndex];
-      
-      if (q.hasImage) {
-        exhibitImg.src = `https://placehold.co/400x250/4f46e5/white?text=Exhibit+Q${q.id}`;
-        exhibitImg.classList.remove('hidden');
-      } else {
-        exhibitImg.classList.add('hidden');
-      }
-
-      questionText.textContent = `${q.id ? q.id + '. ' : ''}${q.text}`;
-      optionsContainer.innerHTML = (q.options || []).map((opt, i) => `
-        <button class="w-full p-2.5 text-left rounded-lg border-2 border-white/20 hover:bg-white/10 transition text-sm"
-          onclick="selectOption(${i})">
-          <span class="font-bold mr-1">${String.fromCharCode(65 + i)}.</span> ${opt}
-        </button>
-      `).join('');
-
-      prevBtn.disabled = currentQuestionIndex === 0;
-      nextBtn.disabled = userAnswers[currentQuestionIndex] === null;
-    }
-
-    function selectOption(index) {
-      if (userAnswers[currentQuestionIndex] !== null) return;
-      userAnswers[currentQuestionIndex] = index;
-
-      const buttons = optionsContainer.querySelectorAll('button');
-      buttons.forEach((btn, i) => {
-        btn.classList.toggle('border-purple-400', i === index);
-        btn.classList.toggle('bg-purple-500/30', i === index);
-      });
-
-      if (index === quizQuestions[currentQuestionIndex].correct) {
-        buttons[index].classList.add('correct');
-        score++;
-      } else {
-        buttons[index].classList.add('wrong');
-        const correctIndex = quizQuestions[currentQuestionIndex].correct;
-        if (correctIndex >= 0) {
-          buttons[correctIndex].classList.add('correct');
-        }
-      }
-
-      nextBtn.disabled = false;
-    }
-
-    function nextQuestion() {
-      if (userAnswers[currentQuestionIndex] === null) return;
-      currentQuestionIndex++;
-      showQuestion();
-    }
-
-    function prevQuestion() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-      }
-    }
-
-    function showResults() {
-      questionCard.classList.add('hidden');
-      resultsContainer.classList.remove('hidden');
-      scoreDisplay.textContent = `${score}/${quizQuestions.length}`;
-    }
-
-    // Deck Management
-    function renderHomeDecks() {
-      if (decks.length <= 1) {
-        noDecks.style.display = 'block';
-        homeDecks.innerHTML = '';
-      } else {
-        noDecks.style.display = 'none';
-        homeDecks.innerHTML = decks
-          .filter(deck => deck.id !== "ccna-200-301")
-          .map(deck => `
-            <div class="glass hover-lift rounded-xl p-4">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-base font-bold text-purple-300">${deck.name}</h3>
-                <span class="text-xs text-white/60">${new Date(deck.created).toLocaleDateString('en-GB')}</span>
-              </div>
-              <p class="text-white/80 mb-3 text-sm">${deck.data.length} Questions</p>
-              <button class="w-full px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-sm font-medium" onclick="startQuiz('${deck.id}')">
-                Play Now
-              </button>
-            </div>
-          `).join('');
-      }
-    }
-
-    // Event Listeners
-    prevBtn.addEventListener('click', prevQuestion);
-    nextBtn.addEventListener('click', nextQuestion);
-    retryBtn.addEventListener('click', () => startQuiz(currentDeckId));
-
-    // Initialize
-    renderHomeDecks();
-    showSection('home');
-  </script>
+    `;
+  }).join('') : '<p class="text-xl text-white/60">No custom decks yet!</p>';
+}
+loadDecks();
+</script>
 </body>
 </html>
-
+        <button id="next" class="px-12 py-6 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-bold text...
