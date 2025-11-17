@@ -16,7 +16,7 @@
     .progress-bar { height: 8px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 4px; transition: width 0.4s ease; }
     .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
     .hover-lift { transition: all 0.3s; }
-    .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 25px 50px rgba(0,0,0,0.4); }
+    .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
     .correct { background: #10b981 !important; color: white; }
     .wrong { background: #ef4444 !important; color: white; }
     .section { display: none; }
@@ -24,87 +24,115 @@
     .exhibit-img {
       max-width: 100%;
       border-radius: 12px;
-      margin: 16px 0;
+      margin: 12px 0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      height: auto;
     }
     .dark-mode {
       background: linear-gradient(to bottom right, #0f172a, #1e293b, #1e1b4b) !important;
+    }
+    /* Mobile-specific adjustments */
+    @media (max-width: 768px) {
+      .text-6xl { font-size: 2.5rem; }
+      .text-5xl { font-size: 2.25rem; }
+      .text-4xl { font-size: 2rem; }
+      .text-3xl { font-size: 1.875rem; }
+      .text-2xl { font-size: 1.5rem; }
+      .px-8 { padding-left: 1rem; padding-right: 1rem; }
+      .py-8 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+      .px-6 { padding-left: 1rem; padding-right: 1rem; }
+      .py-6 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+      .px-5 { padding-left: 1rem; padding-right: 1rem; }
+      .py-5 { padding-top: 1rem; padding-bottom: 1rem; }
+      .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
+      .py-4 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+      .gap-6 { gap: 1rem; }
+      .gap-3 { gap: 0.5rem; }
+      .p-16 { padding: 1.5rem; }
+      .rounded-3xl { border-radius: 1rem; }
+      .text-xl { font-size: 1.125rem; }
+      .h-80 { height: 40vh; }
+      .max-w-3xl { max-width: 100%; }
+      nav { flex-wrap: wrap; justify-content: center; }
+      .fixed { position: fixed; }
     }
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
 
-  <button onclick="toggleDarkMode()" class="fixed top-4 right-4 z-50 text-2xl bg-white/10 border border-white/20 rounded-full px-4 py-2 hover:bg-white/20 transition">
+  <button onclick="toggleDarkMode()" class="fixed top-3 right-3 z-50 text-lg bg-white/10 border border-white/20 rounded-full p-2 hover:bg-white/20 transition">
     <span id="darkModeIcon">🌙</span>
   </button>
 
-  <header class="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between">
-    <div class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">QuizForge</div>
-    <nav class="flex gap-3">
-      <button class="px-5 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('home')">Home</button>
-      <button class="px-5 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('upload')">Upload</button>
-      <button class="px-5 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('play')">Play</button>
-    </nav>
+  <header class="max-w-6xl mx-auto px-4 py-4">
+    <div class="flex flex-col items-center">
+      <div class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">QuizForge</div>
+      <nav class="flex flex-wrap justify-center gap-2 mt-2">
+        <button class="px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('home')">Home</button>
+        <button class="px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('upload')">Upload</button>
+        <button class="px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 transition" onclick="showSection('play')">Play</button>
+      </nav>
+    </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8">
+  <main class="max-w-6xl mx-auto px-3 py-4">
     <!-- HOME SECTION -->
-    <section id="home" class="section active space-y-8">
-      <div class="text-center py-16">
-        <h1 class="text-6xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+    <section id="home" class="section active space-y-6">
+      <div class="text-center py-8">
+        <h1 class="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
           Turn Your Notes into Victory
         </h1>
-        <p class="text-2xl text-white/80">Pakistan's #1 AI Quiz App • Includes Cisco CCNA Questions</p>
-        <div class="mt-8 flex justify-center gap-6">
-          <button class="px-8 py-4 text-xl rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition" onclick="showSection('upload')">
-            <i class="fas fa-upload mr-2"></i> Upload Notes
+        <p class="text-base md:text-lg text-white/80 mb-4">Pakistan's #1 AI Quiz App • Includes Cisco CCNA Questions</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-3">
+          <button class="px-4 py-3 text-base rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition" onclick="showSection('upload')">
+            <i class="fas fa-upload mr-1"></i> Upload Notes
           </button>
-          <button class="px-8 py-4 text-xl rounded-2xl bg-white/10 border-2 border-white/30 hover:bg-white/20 transition" onclick="showSection('play')">
-            <i class="fas fa-play mr-2"></i> Start CCNA Quiz
+          <button class="px-4 py-3 text-base rounded-xl bg-white/10 border border-white/30 hover:bg-white/20 transition" onclick="showSection('play')">
+            <i class="fas fa-play mr-1"></i> Start CCNA Quiz
           </button>
         </div>
       </div>
 
-      <div class="glass hover-lift rounded-3xl p-10 text-center">
-        <h2 class="text-3xl font-bold mb-6">My Decks</h2>
-        <div id="home_decks" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        <p class="text-white/60 mt-6" id="no_decks">No custom decks yet • Upload notes to create one!</p>
+      <div class="glass hover-lift rounded-2xl p-5 text-center">
+        <h2 class="text-2xl font-bold mb-4">My Decks</h2>
+        <div id="home_decks" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <p class="text-white/60 mt-4 text-sm" id="no_decks">No custom decks yet • Upload notes to create one!</p>
       </div>
     </section>
 
     <!-- UPLOAD SECTION -->
-    <section id="upload" class="section space-y-8">
-      <div class="text-center py-12">
-        <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Upload Your Notes (Scanned PDFs bhi chalenge!)
+    <section id="upload" class="section space-y-6">
+      <div class="text-center py-8">
+        <h1 class="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          Upload Your Notes
         </h1>
-        <p class="text-xl text-white/80 mb-8">PDF, Photo, TXT • Urdu + English • 100% Private</p>
+        <p class="text-base text-white/80 mb-6">PDF, Photo, TXT • Urdu + English • 100% Private</p>
         
-        <div id="drop_zone" class="drop-zone rounded-3xl p-16 mb-8 cursor-pointer hover-lift glass">
-          <i class="fas fa-brain text-8xl mb-6 text-purple-400"></i>
-          <p class="text-3xl font-bold">Drop your file here</p>
-          <p class="text-xl text-white/60 mt-3">Scanned books, photos, handwritten notes — sab chalega!</p>
+        <div id="drop_zone" class="drop-zone rounded-2xl p-8 mb-6 cursor-pointer hover-lift glass">
+          <i class="fas fa-cloud-upload-alt text-4xl md:text-5xl mb-3 text-purple-400"></i>
+          <p class="text-xl font-bold mb-1">Drop files here</p>
+          <p class="text-sm text-white/60">or tap to browse</p>
           <input type="file" id="file_input" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.txt" multiple>
         </div>
 
-        <div id="upload_result" class="mt-12 hidden">
-          <div class="glass rounded-2xl p-8">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-2xl font-bold">AI is Reading Your Notes...</h3>
-              <i id="status_icon" class="fas fa-cog fa-spin text-purple-400 text-3xl"></i>
+        <div id="upload_result" class="mt-6 hidden">
+          <div class="glass rounded-2xl p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold">AI Processing...</h3>
+              <i id="status_icon" class="fas fa-cog fa-spin text-purple-400 text-xl"></i>
             </div>
-            <div class="w-full bg-white/10 rounded-full h-6 mb-4 overflow-hidden">
-              <div id="progress_bar" class="progress-bar h-6" style="width: 0%"></div>
+            <div class="w-full bg-white/10 rounded-full h-3 mb-3">
+              <div id="progress_bar" class="progress-bar h-3 rounded-full" style="width: 0%"></div>
             </div>
-            <p id="progress_text" class="text-center text-xl font-medium">Initializing AI Vision Engine...</p>
+            <p id="progress_text" class="text-center text-sm">Initializing AI Vision...</p>
           </div>
           
-          <div class="glass rounded-2xl p-8 mt-8">
-            <h3 class="text-2xl font-bold mb-4">Extracted Text</h3>
-            <textarea id="text_input" class="w-full h-80 bg-white/5 border border-white/20 rounded-xl p-6 text-lg" placeholder="AI will show text here..."></textarea>
-            <div class="mt-6 text-center">
-              <button id="process_btn" class="px-10 py-5 text-xl rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition font-bold shadow-2xl">
-                Generate Quiz from Text
+          <div class="glass rounded-2xl p-5 mt-4">
+            <h3 class="text-lg font-bold mb-3">Extracted Text</h3>
+            <textarea id="text_input" class="w-full h-40 bg-white/5 border border-white/20 rounded-lg p-3 text-sm" placeholder="Your text will appear here..."></textarea>
+            <div class="mt-4 text-center">
+              <button id="process_btn" class="px-5 py-2.5 text-base rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition font-medium">
+                Generate Quiz
               </button>
             </div>
           </div>
@@ -113,37 +141,37 @@
     </section>
 
     <!-- PLAY SECTION -->
-    <section id="play" class="section space-y-8">
-      <div class="text-center py-8">
-        <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+    <section id="play" class="section space-y-6">
+      <div class="text-center py-4">
+        <h1 class="text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
           Quiz Time!
         </h1>
-        <p class="text-xl text-white/80 mb-8" id="play-mode-text">Test your knowledge with AI-generated or CCNA questions</p>
+        <p class="text-sm md:text-base text-white/80 mb-2" id="play-mode-text">Test your knowledge</p>
       </div>
       
-      <div id="quiz_container" class="glass rounded-3xl p-8 max-w-3xl mx-auto">
+      <div id="quiz_container" class="glass rounded-2xl p-4 md:p-6">
         <div id="question_card">
           <img id="exhibit_img" class="exhibit-img hidden" src="" alt="Exhibit">
-          <h2 id="question_text" class="text-xl md:text-2xl font-bold mb-6 min-h-[80px]">Loading your first question...</h2>
-          <div id="options_container" class="space-y-3 mb-8"></div>
-          <div class="flex justify-between">
-            <button id="prev_btn" class="px-5 py-2.5 rounded-xl bg-white/10 border border-white/30 hover:bg-white/20 transition" disabled>
+          <h2 id="question_text" class="text-base md:text-lg font-bold mb-4 min-h-[60px]">Loading question...</h2>
+          <div id="options_container" class="space-y-2 mb-5"></div>
+          <div class="flex flex-col sm:flex-row justify-between gap-2">
+            <button id="prev_btn" class="px-3 py-2 rounded-lg bg-white/10 border border-white/30 hover:bg-white/20 transition text-sm" disabled>
               <i class="fas fa-arrow-left mr-1"></i> Prev
             </button>
-            <button id="next_btn" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition font-medium">
+            <button id="next_btn" class="px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-sm font-medium">
               Next <i class="fas fa-arrow-right ml-1"></i>
             </button>
           </div>
         </div>
         
-        <div id="results_container" class="hidden text-center py-8">
-          <h2 class="text-3xl font-bold mb-4">Quiz Complete!</h2>
-          <div class="text-6xl font-bold my-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent" id="score_display">0/0</div>
-          <div class="flex justify-center gap-4 mt-6">
-            <button id="retry_btn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition">
-              <i class="fas fa-redo mr-1"></i> Try Again
+        <div id="results_container" class="hidden text-center py-5">
+          <h2 class="text-xl font-bold mb-2">Quiz Complete!</h2>
+          <div class="text-4xl font-bold my-3 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent" id="score_display">0/0</div>
+          <div class="flex flex-col sm:flex-row justify-center gap-2 mt-4">
+            <button id="retry_btn" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-sm">
+              <i class="fas fa-redo mr-1"></i> Retry
             </button>
-            <button class="px-6 py-3 rounded-xl bg-white/10 border border-white/30 hover:bg-white/20 transition" onclick="showSection('home')">
+            <button class="px-4 py-2 rounded-lg bg-white/10 border border-white/30 hover:bg-white/20 transition text-sm" onclick="showSection('home')">
               <i class="fas fa-home mr-1"></i> Home
             </button>
           </div>
@@ -227,11 +255,11 @@
           }
         });
         progressText.textContent = 'AI Vision Ready! Drop your file!';
-        statusIcon.className = 'fas fa-check-circle text-green-400 text-3xl';
+        statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
       } catch (err) {
         console.error('Tesseract initialization failed:', err);
-        progressText.textContent = 'AI Vision failed to load. Please refresh.';
-        statusIcon.className = 'fas fa-times-circle text-red-400 text-3xl';
+        progressText.textContent = 'AI Vision failed. Please refresh.';
+        statusIcon.className = 'fas fa-times-circle text-red-400 text-xl';
       }
     })();
 
@@ -245,7 +273,6 @@
         textInput.value = '';
         resetUploadUI();
       } else if (sectionId === 'play' && currentDeckId === null) {
-        // Start with CCNA deck by default
         startQuiz("ccna-200-301");
       }
     }
@@ -253,7 +280,7 @@
     function resetUploadUI() {
       progressBar.style.width = '0%';
       progressText.textContent = 'AI Vision Ready! Drop your file!';
-      statusIcon.className = 'fas fa-check-circle text-green-400 text-3xl';
+      statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
     }
 
     // Dark Mode Toggle
@@ -296,7 +323,7 @@
       textInput.value = '';
       progressBar.style.width = '5%';
       progressText.textContent = 'Opening file...';
-      statusIcon.className = 'fas fa-cog fa-spin text-purple-400 text-3xl';
+      statusIcon.className = 'fas fa-cog fa-spin text-purple-400 text-xl';
 
       try {
         if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
@@ -305,34 +332,33 @@
             textInput.value = e.target.result;
             progressBar.style.width = '100%';
             progressText.textContent = 'Text loaded!';
-            statusIcon.className = 'fas fa-check-circle text-green-400 text-3xl';
+            statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
           };
           reader.readAsText(file);
         }
         else if (file.type.includes('image') || file.name.match(/\.(pdf|jpe?g|png)$/i)) {
-          progressText.textContent = 'AI is scanning your file...';
-          statusIcon.className = 'fas fa-eye text-purple-400 text-3xl';
+          progressText.textContent = 'AI scanning file...';
+          statusIcon.className = 'fas fa-eye text-purple-400 text-xl';
           
           if (file.type.includes('image')) {
             const result = await worker.recognize(file);
-            textInput.value = result.data.text || 'No text found. Try a clearer image.';
+            textInput.value = result.data.text || 'No text found. Try clearer image.';
             progressBar.style.width = '100%';
-            progressText.textContent = 'Scanned successfully! AI extracted text!';
-            statusIcon.className = 'fas fa-check-circle text-green-400 text-3xl';
+            progressText.textContent = 'Scanned successfully!';
+            statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
           } else {
-            // Simulate PDF processing
             setTimeout(() => {
-              textInput.value = `This is sample extracted text from your ${file.name} file.\n\nThe AI has successfully processed your document and extracted the following content:\n\n• Artificial Intelligence is transforming education\n• Machine Learning algorithms can analyze student performance\n• Natural Language Processing helps in content understanding\n• Computer Vision enables document scanning\n\nUrdu text support is also available for Pakistani students.`;
+              textInput.value = `Sample text from ${file.name}.\n\n• AI processed your document\n• Supports Urdu & English\n• Ready for quiz generation!`;
               progressBar.style.width = '100%';
-              progressText.textContent = 'Scanned successfully! AI extracted text!';
-              statusIcon.className = 'fas fa-check-circle text-green-400 text-3xl';
+              progressText.textContent = 'Scanned successfully!';
+              statusIcon.className = 'fas fa-check-circle text-green-400 text-xl';
             }, 2000);
           }
         }
       } catch (err) {
-        console.error('File processing error:', err);
-        progressText.textContent = 'Error: ' + (err.message || 'Failed to process file');
-        statusIcon.className = 'fas fa-times-circle text-red-400 text-3xl';
+        console.error('File error:', err);
+        progressText.textContent = 'Error: ' + (err.message || 'Processing failed');
+        statusIcon.className = 'fas fa-times-circle text-red-400 text-xl';
       }
     }
 
@@ -347,14 +373,14 @@
     });
 
     function generateQuizFromText(text) {
-      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
       quizQuestions = [];
       
       for (let i = 0; i < Math.min(5, sentences.length); i++) {
         const sentence = sentences[i].trim();
         const words = sentence.split(' ');
         
-        if (words.length > 5) {
+        if (words.length > 4) {
           const blankIndex = Math.floor(words.length / 2);
           const correctAnswer = words[blankIndex];
           words[blankIndex] = '_______';
@@ -374,41 +400,35 @@
       
       if (quizQuestions.length === 0) {
         quizQuestions = [{
-          question: "AI couldn't generate questions from your text. Try uploading different notes!",
+          question: "AI couldn't generate questions. Try different notes!",
           correctAnswer: "Try again",
           options: ["Try again", "Upload new notes", "Use sample questions", "Contact support"]
         }];
       }
       
-      // Create new deck
       const newDeck = {
         id: Date.now().toString(),
-        name: `Custom Deck ${decks.length}`,
+        name: `Deck ${decks.length}`,
         created: new Date().toISOString(),
         data: quizQuestions
       };
       
       decks.push(newDeck);
       renderHomeDecks();
-      
-      // Start quiz with new deck
       currentDeckId = newDeck.id;
-      playModeText.textContent = "Your custom quiz from uploaded notes";
+      playModeText.textContent = "Your custom quiz";
       startQuizForCurrentDeck();
     }
 
     function startQuiz(deckId) {
       currentDeckId = deckId;
       const deck = decks.find(d => d.id === deckId);
-      if (!deck) {
-        console.error("Deck not found:", deckId);
-        return;
-      }
+      if (!deck) return;
       
       quizQuestions = deck.data;
       playModeText.textContent = deckId === "ccna-200-301" 
-        ? "Cisco CCNA 200-301 Practice Questions" 
-        : `Playing: ${deck.name}`;
+        ? "CCNA Practice" 
+        : deck.name;
       
       startQuizForCurrentDeck();
     }
@@ -435,17 +455,17 @@
       const q = quizQuestions[currentQuestionIndex];
       
       if (q.hasImage) {
-        exhibitImg.src = `https://placehold.co/600x400/4f46e5/white?text=Exhibit+for+Q${q.id}`;
+        exhibitImg.src = `https://placehold.co/400x250/4f46e5/white?text=Exhibit+Q${q.id}`;
         exhibitImg.classList.remove('hidden');
       } else {
         exhibitImg.classList.add('hidden');
       }
 
-      questionText.textContent = `${q.id ? q.id + '. ' : ''}${q.question || q.text}`;
+      questionText.textContent = `${q.id ? q.id + '. ' : ''}${q.text}`;
       optionsContainer.innerHTML = (q.options || []).map((opt, i) => `
-        <button class="w-full p-3 text-left rounded-xl border-2 border-white/20 hover:bg-white/10 transition"
+        <button class="w-full p-2.5 text-left rounded-lg border-2 border-white/20 hover:bg-white/10 transition text-sm"
           onclick="selectOption(${i})">
-          <span class="font-bold mr-2">${String.fromCharCode(65 + i)}.</span> ${opt}
+          <span class="font-bold mr-1">${String.fromCharCode(65 + i)}.</span> ${opt}
         </button>
       `).join('');
 
@@ -463,12 +483,12 @@
         btn.classList.toggle('bg-purple-500/30', i === index);
       });
 
-      if (index === (quizQuestions[currentQuestionIndex].correct || quizQuestions[currentQuestionIndex].correctAnswer)) {
+      if (index === quizQuestions[currentQuestionIndex].correct) {
         buttons[index].classList.add('correct');
         score++;
       } else {
         buttons[index].classList.add('wrong');
-        const correctIndex = quizQuestions[currentQuestionIndex].correct || quizQuestions[currentQuestionIndex].correctAnswer;
+        const correctIndex = quizQuestions[currentQuestionIndex].correct;
         if (correctIndex >= 0) {
           buttons[correctIndex].classList.add('correct');
         }
@@ -498,25 +518,23 @@
 
     // Deck Management
     function renderHomeDecks() {
-      if (decks.length <= 1) { // Only CCNA deck exists
+      if (decks.length <= 1) {
         noDecks.style.display = 'block';
         homeDecks.innerHTML = '';
       } else {
         noDecks.style.display = 'none';
         homeDecks.innerHTML = decks
-          .filter(deck => deck.id !== "ccna-200-301") // Hide CCNA from custom decks
+          .filter(deck => deck.id !== "ccna-200-301")
           .map(deck => `
-            <div class="glass hover-lift rounded-2xl p-6 flex flex-col">
-              <div class="flex justify-between items-start mb-4">
-                <h3 class="text-xl font-bold text-purple-300">${deck.name}</h3>
-                <span class="text-sm text-white/60">${new Date(deck.created).toLocaleDateString('en-GB')}</span>
+            <div class="glass hover-lift rounded-xl p-4">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-base font-bold text-purple-300">${deck.name}</h3>
+                <span class="text-xs text-white/60">${new Date(deck.created).toLocaleDateString('en-GB')}</span>
               </div>
-              <p class="text-white/80 mb-6">${deck.data.length} Questions</p>
-              <div class="flex gap-3 mt-auto">
-                <button class="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition font-semibold" onclick="startQuiz('${deck.id}')">
-                  Play Now
-                </button>
-              </div>
+              <p class="text-white/80 mb-3 text-sm">${deck.data.length} Questions</p>
+              <button class="w-full px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-sm font-medium" onclick="startQuiz('${deck.id}')">
+                Play Now
+              </button>
             </div>
           `).join('');
       }
